@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -310,12 +310,12 @@
         <!-- Start Screen -->
         <div class="start-screen active">
             <div class="input-group">
-                <label for="username">Enter Your Name:</label>
-                <input type="text" id="username" placeholder="e.g., John Doe">
+                <label for="username">Apna Naam Daalo:</label>
+                <input type="text" id="username" placeholder="Jaise: Rahul Kumar">
             </div>
             <div class="input-group">
-                <label for="xid">Enter Your X (Twitter) ID:</label>
-                <input type="text" id="xid" placeholder="e.g., @john123">
+                <label for="xid">Apna X (Twitter) ID Daalo:</label>
+                <input type="text" id="xid" placeholder="Jaise: @rahul123">
             </div>
             <button onclick="startQuiz()">Quiz Start</button>
         </div>
@@ -340,8 +340,8 @@
                 <p id="resultMessage"></p>
             </div>
             <div class="share-buttons">
-                <button class="x-share" onclick="shareOnX()">Share on X</button>
-                <button class="restart" onclick="Play Again</button>
+                <button class="x-share" onclick="shareOnX()">X pe Share Karo</button>
+                <button class="restart" onclick="restartQuiz()">Dobara Khelo</button>
             </div>
         </div>
     </div>
@@ -411,7 +411,7 @@
             xid = document.getElementById('xid').value.trim();
 
             if (!username || !xid) {
-                alert('Please enter your name and X ID!');
+                alert('Kripya apna naam aur X ID daalo!');
                 return;
             }
 
@@ -422,7 +422,7 @@
 
         function showQuestion() {
             const q = questions[currentQuestion];
-            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('questionNumber').textContent = `Sawal ${currentQuestion + 1} / ${questions.length}`;
             document.getElementById('question').textContent = q.question;
             
             const optionsDiv = document.getElementById('options');
@@ -484,20 +484,20 @@
             
             let message = '';
             if (score === questions.length) {
-                message = `Excellent ${username}! Perfect Score! 🎉`;
+                message = `Bahut Badhiya ${username}! Perfect Score! 🎉`;
             } else if (score >= questions.length * 0.7) {
-                message = `Great job ${username}! Well done! 👏`;
+                message = `Shabaash ${username}! Achha kiya! 👏`;
             } else if (score >= questions.length * 0.5) {
-                message = `Good effort ${username}, keep practicing! 💪`;
+                message = `Theek hai ${username}, aur mehnat karo! 💪`;
             } else {
-                message = `${username}, try again! 📚`;
+                message = `${username}, dobara koshish karo! 📚`;
             }
             
             document.getElementById('resultMessage').textContent = message;
         }
 
         function shareOnX() {
-            const text = `I scored ${score}/${questions.length} on Quiz Ritual! 🎯\n\nCan you beat my score? ${xid}`;
+            const text = `Maine Quiz Ritual mein ${score}/${questions.length} score kiya! 🎯\n\nKya aap mujhse behtar kar sakte ho? ${xid}`;
             const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
             window.open(url, '_blank');
         }
