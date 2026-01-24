@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Ritual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #ffffff 50%, #1a1a1a 75%, #000000 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,255,255,0.3);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .x-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #000;
+            color: white;
+            padding: 6px 12px 6px 6px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .x-badge img.profile-pic {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            display: block;
+            background: white;
+        }
+
+        .x-badge:hover {
+            transform: scale(1.05);
+            background: #1a1a1a;
+        }
+
+        .x-badge svg {
+            flex-shrink: 0;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #000000, #ffffff, #000000);
+            background-size: 200% 200%;
+            animation: gradientGlow 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 800;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+        }
+
+        @keyframes gradientGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .start-screen, .quiz-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .quiz-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .question-number {
+            color: #000;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .option:hover {
+            background: #f0f0f0;
+            border-color: #000;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #000, #333);
+            color: white;
+            border-color: #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        button {
+            background: linear-gradient(135deg, #000, #333, #000);
+            background-size: 200% 200%;
+            animation: buttonGlow 3s ease infinite;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        @keyframes buttonGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .score-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-display h2 {
+            background: linear-gradient(135deg, #000, #fff, #000);
+            background-size: 200% 200%;
+            animation: gradientGlow 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .score-display p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .share-buttons button {
+            flex: 1;
+        }
+
+        .x-share {
+            background: #000;
+        }
+
+        .x-share:hover {
+            background: #333;
+        }
+
+        .restart {
+            background: linear-gradient(135deg, #333, #666, #333);
+            background-size: 200% 200%;
+            animation: buttonGlow 3s ease infinite;
+        }
+
+        .restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(51,51,51,0.4);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #000, #fff, #000);
+            background-size: 200% 200%;
+            animation: progressGlow 2s ease infinite;
+            transition: width 0.3s;
+        }
+
+        @keyframes progressGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="x-badge" href="https://x.com/Moneyz0x" target="_blank" style="display: flex;">
+            <img src="https://pbs.twimg.com/profile_images/2014273475226251264/jMmg_1Mo.jpg" alt="Profile" class="profile-pic" onload="console.log('Profile loaded')" onerror="console.log('Profile failed'); this.style.display='none'">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            <span>@Moneyz0x</span>
+        </a>
+        <h1>Quiz Ritual</h1>
+        
+        <!-- Start Screen -->
+        <div class="start-screen active">
+            <div class="input-group">
+                <label for="username">Enter Your Name:</label>
+                <input type="text" id="username" placeholder="e.g., John Doe">
+            </div>
+            <div class="input-group">
+                <label for="xid">Enter Your X (Twitter) ID:</label>
+                <input type="text" id="xid" placeholder="e.g., @john123">
+            </div>
+            <button onclick="startQuiz()">Quiz Start</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-screen">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="question-container">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+            </div>
+            <button id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="result-screen">
+            <div class="score-display">
+                <h2 id="finalScore"></h2>
+                <p id="resultMessage"></p>
+            </div>
+            <div class="share-buttons">
+                <button class="x-share" onclick="shareOnX()">Share on X</button>
+                <button class="restart" onclick="Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "According to the source material, what is the primary concern when using AI agents for on-chain activities involving real money?",
+                options: [
+                    "The cost of running the AI model.",
+                    "The speed of the AI's response.",
+                    "Whether the AI can be trusted.",
+                    "The complexity of the AI's code."
+                ],
+                correct: 2
+            },
+            {
+                question: "Which rule do blockchains follow to build trust, as described in the text?",
+                options: [
+                    "Same input leads to the same output with proof.",
+                    "Different inputs eventually lead to a single consensus.",
+                    "Outputs are based on the context of the user.",
+                    "The fastest output is always accepted as the truth."
+                ],
+                correct: 0
+            },
+            {
+                question: "How does the text characterize the way current AI models provide answers?",
+                options: [
+                    "Random and unpredictable.",
+                    "Fixed and unchangeable.",
+                    "Deterministic and absolute.",
+                    "Probabilistic and context-based."
+                ],
+                correct: 3
+            },
+            {
+                question: "What is the current problem with how smart contracts interact with AI APIs today?",
+                options: [
+                    "The APIs are too slow for blockchain transactions.",
+                    "The contract accepts answers without verification.",
+                    "Smart contracts cannot read API data.",
+                    "AI APIs are too expensive for small contracts."
+                ],
+                correct: 1
+            },
+            {
+                question: "How does the text describe 'Web2 automation with a wallet attached'?",
+                options: [
+                    "The final goal of Ritual's technology.",
+                    "Centralized AI that requires blind trust.",
+                    "A more secure version of smart contracts.",
+                    "A decentralized way to run AI."
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let username = "";
+        let xid = "";
+        let selectedOption = -1;
+
+        function startQuiz() {
+            username = document.getElementById('username').value.trim();
+            xid = document.getElementById('xid').value.trim();
+
+            if (!username || !xid) {
+                alert('Please enter your name and X ID!');
+                return;
+            }
+
+            document.querySelector('.start-screen').classList.remove('active');
+            document.querySelector('.quiz-screen').classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('question').textContent = q.question;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectOption(index);
+                optionsDiv.appendChild(optionDiv);
+            });
+
+            updateProgress();
+            selectedOption = -1;
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        function selectOption(index) {
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            selectedOption = index;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            if (selectedOption === q.correct) {
+                score++;
+                options[selectedOption].classList.add('correct');
+            } else {
+                options[selectedOption].classList.add('wrong');
+                options[q.correct].classList.add('correct');
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1000);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.querySelector('.quiz-screen').classList.remove('active');
+            document.querySelector('.result-screen').classList.add('active');
+            
+            document.getElementById('finalScore').textContent = `${score} / ${questions.length}`;
+            
+            let message = '';
+            if (score === questions.length) {
+                message = `Excellent ${username}! Perfect Score! 🎉`;
+            } else if (score >= questions.length * 0.7) {
+                message = `Great job ${username}! Well done! 👏`;
+            } else if (score >= questions.length * 0.5) {
+                message = `Good effort ${username}, keep practicing! 💪`;
+            } else {
+                message = `${username}, try again! 📚`;
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+        }
+
+        function shareOnX() {
+            const text = `I scored ${score}/${questions.length} on Quiz Ritual! 🎯\n\nCan you beat my score? ${xid}`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.querySelector('.result-screen').classList.remove('active');
+            document.querySelector('.start-screen').classList.add('active');
+        }
+    </script>
+</body>
+</html>
