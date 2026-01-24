@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Ritual</title>
+    <title>Quiz Ritual - Test Your Knowledge</title>
+    <meta name="description" content="Test your AI & Blockchain knowledge with Quiz Ritual">
     <style>
         * {
             margin: 0;
@@ -89,7 +90,6 @@
             margin-bottom: 30px;
             font-size: 2.5em;
             font-weight: 800;
-            text-shadow: 0 0 30px rgba(255,255,255,0.5);
         }
 
         @keyframes gradientGlow {
@@ -132,15 +132,20 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
 
+        input::placeholder {
+            color: #999;
+        }
+
         .question-container {
             margin-bottom: 30px;
         }
 
         .question {
-            font-size: 1.3em;
+            font-size: 1.2em;
             color: #333;
             margin-bottom: 20px;
             font-weight: 600;
+            line-height: 1.4;
         }
 
         .question-number {
@@ -162,6 +167,7 @@
             cursor: pointer;
             transition: all 0.3s;
             background: white;
+            font-size: 0.95em;
         }
 
         .option:hover {
@@ -219,6 +225,7 @@
         button:disabled {
             background: #ccc;
             cursor: not-allowed;
+            animation: none;
         }
 
         .score-display {
@@ -294,12 +301,35 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .question {
+                font-size: 1.1em;
+            }
+
+            .x-badge {
+                font-size: 12px;
+            }
+
+            .x-badge img.profile-pic {
+                width: 30px;
+                height: 30px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <a class="x-badge" href="https://x.com/Moneyz0x" target="_blank" style="display: flex;">
-            <img src="https://pbs.twimg.com/profile_images/2014273475226251264/jMmg_1Mo.jpg" alt="Profile" class="profile-pic" onload="console.log('Profile loaded')" onerror="console.log('Profile failed'); this.style.display='none'">
+        <a class="x-badge" href="https://x.com/Moneyz0x" target="_blank">
+            <img src="https://pbs.twimg.com/profile_images/2014273475226251264/jMmg_1Mo.jpg" alt="Profile" class="profile-pic">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
@@ -310,14 +340,14 @@
         <!-- Start Screen -->
         <div class="start-screen active">
             <div class="input-group">
-                <label for="username">Apna Naam Daalo:</label>
-                <input type="text" id="username" placeholder="Jaise: Rahul Kumar">
+                <label for="username">Enter Your Name:</label>
+                <input type="text" id="username" placeholder="e.g., John Doe">
             </div>
             <div class="input-group">
-                <label for="xid">Apna X (Twitter) ID Daalo:</label>
-                <input type="text" id="xid" placeholder="Jaise: @rahul123">
+                <label for="xid">Enter Your X (Twitter) ID:</label>
+                <input type="text" id="xid" placeholder="e.g., @john123">
             </div>
-            <button onclick="startQuiz()">Quiz Start</button>
+            <button onclick="startQuiz()">Start Quiz</button>
         </div>
 
         <!-- Quiz Screen -->
@@ -340,8 +370,8 @@
                 <p id="resultMessage"></p>
             </div>
             <div class="share-buttons">
-                <button class="x-share" onclick="shareOnX()">X pe Share Karo</button>
-                <button class="restart" onclick="restartQuiz()">Dobara Khelo</button>
+                <button class="x-share" onclick="shareOnX()">Share on X</button>
+                <button class="restart" onclick="restartQuiz()">Play Again</button>
             </div>
         </div>
     </div>
@@ -411,7 +441,7 @@
             xid = document.getElementById('xid').value.trim();
 
             if (!username || !xid) {
-                alert('Kripya apna naam aur X ID daalo!');
+                alert('Please enter your name and X ID!');
                 return;
             }
 
@@ -422,7 +452,7 @@
 
         function showQuestion() {
             const q = questions[currentQuestion];
-            document.getElementById('questionNumber').textContent = `Sawal ${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
             document.getElementById('question').textContent = q.question;
             
             const optionsDiv = document.getElementById('options');
@@ -484,20 +514,20 @@
             
             let message = '';
             if (score === questions.length) {
-                message = `Bahut Badhiya ${username}! Perfect Score! 🎉`;
+                message = `Excellent ${username}! Perfect Score! 🎉`;
             } else if (score >= questions.length * 0.7) {
-                message = `Shabaash ${username}! Achha kiya! 👏`;
+                message = `Great job ${username}! Well done! 👏`;
             } else if (score >= questions.length * 0.5) {
-                message = `Theek hai ${username}, aur mehnat karo! 💪`;
+                message = `Good effort ${username}, keep practicing! 💪`;
             } else {
-                message = `${username}, dobara koshish karo! 📚`;
+                message = `${username}, try again for a better score! 📚`;
             }
             
             document.getElementById('resultMessage').textContent = message;
         }
 
         function shareOnX() {
-            const text = `Maine Quiz Ritual mein ${score}/${questions.length} score kiya! 🎯\n\nKya aap mujhse behtar kar sakte ho? ${xid}`;
+            const text = `I scored ${score}/${questions.length} on Quiz Ritual! 🎯\n\nCan you beat my score? ${xid}`;
             const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
             window.open(url, '_blank');
         }
@@ -507,6 +537,8 @@
             score = 0;
             document.querySelector('.result-screen').classList.remove('active');
             document.querySelector('.start-screen').classList.add('active');
+            document.getElementById('username').value = '';
+            document.getElementById('xid').value = '';
         }
     </script>
 </body>
