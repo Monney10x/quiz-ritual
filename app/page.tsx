@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -60,9 +60,66 @@ const questions = [
     ],
     correct: 1,
   },
+  {
+    question: "Which of the following is NOT listed as a risk of using 'blind trust' in AI agents?",
+    options: [
+      "Managing protocols.",
+      "Improving AI's creativity.",
+      "Triggering contracts.",
+      "Trading funds.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "What is the core idea behind Ritual's solution for AI?",
+    options: [
+      "Make AI faster and more efficient.",
+      "Create AI that doesn't need proof.",
+      "Verify first, then use.",
+      "Replace blockchains with AI networks.",
+    ],
+    correct: 2,
+  },
+  {
+    question: "In the Ritual workflow, what happens immediately after the AI runs off-chain?",
+    options: [
+      "The result is automatically deleted.",
+      "The result comes on-chain for the network to check.",
+      "The smart contract executes without checking.",
+      "The AI is retrained to be smarter.",
+    ],
+    correct: 1,
+  },
+  {
+    question: "According to the text, Ritual's main goal is NOT to make AI smarter, but to make it what?",
+    options: [
+      "Verifiable and usable on-chain.",
+      "Faster than humans.",
+      "Larger and more complex.",
+      "Available for free to everyone.",
+    ],
+    correct: 0,
+  },
+  {
+    question: "What is the final 'crypto-native' principle mentioned regarding AI agents?",
+    options: [
+      "Speed always comes before safety.",
+      "Proof always comes before power.",
+      "AI should have total control.",
+      "Privacy is more important than proof.",
+    ],
+    correct: 1,
+  },
 ]
 
 type Screen = "start" | "quiz" | "result"
+
+interface LeaderboardEntry {
+  name: string
+  score: number
+  time: number
+  timestamp: number
+}
 
 export default function QuizRitual() {
   const [screen, setScreen] = useState<Screen>("start")
@@ -72,12 +129,41 @@ export default function QuizRitual() {
   const [score, setScore] = useState(0)
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [showAnswer, setShowAnswer] = useState(false)
+  const [startTime, setStartTime] = useState(0)
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+
+  useEffect(() => {
+    loadLeaderboard()
+  }, [])
+
+  const loadLeaderboard = () => {
+    const scores = JSON.parse(localStorage.getItem("quizScores") || "[]")
+    setLeaderboard(scores)
+  }
+
+  const saveScore = (name: string, scoreValue: number, time: number) => {
+    let scores: LeaderboardEntry[] = JSON.parse(localStorage.getItem("quizScores") || "[]")
+    scores.push({
+      name,
+      score: scoreValue,
+      time,
+      timestamp: Date.now(),
+    })
+    scores.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score
+      return a.time - b.time
+    })
+    scores = scores.slice(0, 10)
+    localStorage.setItem("quizScores", JSON.stringify(scores))
+    setLeaderboard(scores)
+  }
 
   const startQuiz = () => {
     if (!username.trim() || !xid.trim()) {
       alert("Please enter your name and X ID!")
       return
     }
+    setStartTime(Date.now())
     setScreen("quiz")
   }
 
@@ -102,6 +188,9 @@ export default function QuizRitual() {
         setSelectedOption(null)
         setShowAnswer(false)
       } else {
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000)
+        const finalScore = selectedOption === q.correct ? score + 1 : score
+        saveScore(username, finalScore, timeTaken)
         setScreen("result")
       }
     }, 1000)
@@ -120,6 +209,8 @@ export default function QuizRitual() {
     setShowAnswer(false)
     setUsername("")
     setXid("")
+    setStartTime(0)
+    loadLeaderboard()
     setScreen("start")
   }
 
@@ -136,6 +227,41 @@ export default function QuizRitual() {
       return `${username}, try again for a better score!`
     }
   }
+
+  const Leaderboard = () => (
+    <div className="mt-8 p-5 bg-black/5 rounded-2xl">
+      <h3 className="text-center text-lg font-bold text-black mb-4">Top Scores</h3>
+      <div className="max-h-[300px] overflow-y-auto space-y-2">
+        {leaderboard.length === 0 ? (
+          <p className="text-center text-neutral-500 py-5 italic">No scores yet. Be the first!</p>
+        ) : (
+          leaderboard.map((entry, index) => {
+            const medals = ["text-yellow-500", "text-neutral-400", "text-amber-600"]
+            const bgClasses = [
+              "bg-gradient-to-r from-yellow-100 to-yellow-50 border-yellow-300",
+              "bg-gradient-to-r from-neutral-100 to-neutral-50 border-neutral-300",
+              "bg-gradient-to-r from-amber-100 to-amber-50 border-amber-300",
+            ]
+            return (
+              <div
+                key={entry.timestamp}
+                className={cn(
+                  "flex items-center justify-between p-3 rounded-lg border bg-white",
+                  index < 3 && bgClasses[index]
+                )}
+              >
+                <span className={cn("font-bold text-lg min-w-[30px]", index < 3 && medals[index])}>
+                  {index === 0 ? "1st" : index === 1 ? "2nd" : index === 2 ? "3rd" : `${index + 1}.`}
+                </span>
+                <span className="flex-1 font-semibold text-neutral-800">{entry.name}</span>
+                <span className="font-bold text-black">{entry.score}/10</span>
+              </div>
+            )
+          })
+        )}
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-black flex items-center justify-center p-5">
@@ -195,6 +321,7 @@ export default function QuizRitual() {
               >
                 Start Quiz
               </Button>
+              <Leaderboard />
             </div>
           )}
 
@@ -268,6 +395,7 @@ export default function QuizRitual() {
                   Play Again
                 </Button>
               </div>
+              <Leaderboard />
             </div>
           )}
         </CardContent>
