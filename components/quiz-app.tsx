@@ -1,12 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { cn } from "@/lib/utils"
 
 const questions = [
   {
@@ -63,6 +57,10 @@ const questions = [
 ]
 
 type Screen = "start" | "quiz" | "result"
+
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(" ")
+}
 
 export default function QuizApp() {
   const [screen, setScreen] = useState<Screen>("start")
@@ -137,8 +135,8 @@ export default function QuizApp() {
   const progress = ((currentQuestion + 1) / questions.length) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-white animate-gradient flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl bg-white/95 shadow-2xl border border-white/30 relative">
+    <div className="min-h-screen bg-gradient-to-br from-black via-neutral-900 to-white flex items-center justify-center p-4">
+      <div className="w-full max-w-xl bg-white/95 shadow-2xl border border-white/30 rounded-xl relative">
         <a
           href="https://x.com/Moneyz0x"
           target="_blank"
@@ -156,8 +154,8 @@ export default function QuizApp() {
           <span>@Moneyz0x</span>
         </a>
 
-        <CardContent className="p-8 pt-16">
-          <h1 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-black via-neutral-500 to-black bg-clip-text text-transparent animate-gradient-slow">
+        <div className="p-8 pt-16">
+          <h1 className="text-4xl font-extrabold text-center mb-8 bg-gradient-to-r from-black via-neutral-500 to-black bg-clip-text text-transparent">
             Quiz Ritual
           </h1>
 
@@ -165,42 +163,49 @@ export default function QuizApp() {
           {screen === "start" && (
             <div className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-neutral-700 font-semibold">
+                <label htmlFor="username" className="block text-neutral-700 font-semibold text-sm">
                   Enter Your Name:
-                </Label>
-                <Input
+                </label>
+                <input
                   id="username"
+                  type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="e.g., John Doe"
-                  className="border-2 border-neutral-200 focus:border-black focus:ring-black/30"
+                  className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-black focus:outline-none focus:ring-2 focus:ring-black/20 transition-all"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="xid" className="text-neutral-700 font-semibold">
+                <label htmlFor="xid" className="block text-neutral-700 font-semibold text-sm">
                   Enter Your X (Twitter) ID:
-                </Label>
-                <Input
+                </label>
+                <input
                   id="xid"
+                  type="text"
                   value={xid}
                   onChange={(e) => setXid(e.target.value)}
                   placeholder="e.g., @john123"
-                  className="border-2 border-neutral-200 focus:border-black focus:ring-black/30"
+                  className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg focus:border-black focus:outline-none focus:ring-2 focus:ring-black/20 transition-all"
                 />
               </div>
-              <Button
+              <button
                 onClick={startQuiz}
-                className="w-full bg-gradient-to-r from-black via-neutral-700 to-black animate-gradient-slow text-white font-semibold py-6 hover:shadow-lg transition-all"
+                className="w-full bg-gradient-to-r from-black via-neutral-700 to-black text-white font-semibold py-4 rounded-lg hover:shadow-lg transition-all"
               >
                 Start Quiz
-              </Button>
+              </button>
             </div>
           )}
 
           {/* Quiz Screen */}
           {screen === "quiz" && (
             <div className="space-y-6">
-              <Progress value={progress} className="h-2 bg-neutral-200" />
+              <div className="w-full h-2 bg-neutral-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-black transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
 
               <div className="space-y-4">
                 <p className="text-sm font-bold text-black">
@@ -237,13 +242,13 @@ export default function QuizApp() {
                 </div>
               </div>
 
-              <Button
+              <button
                 onClick={nextQuestion}
                 disabled={selectedOption === null || showAnswer}
-                className="w-full bg-gradient-to-r from-black via-neutral-700 to-black animate-gradient-slow text-white font-semibold py-6 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-black via-neutral-700 to-black text-white font-semibold py-4 rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next Question
-              </Button>
+              </button>
             </div>
           )}
 
@@ -251,31 +256,30 @@ export default function QuizApp() {
           {screen === "result" && (
             <div className="space-y-6 text-center">
               <div className="space-y-2">
-                <h2 className="text-5xl font-extrabold bg-gradient-to-r from-black via-neutral-500 to-black bg-clip-text text-transparent animate-gradient-slow">
+                <h2 className="text-5xl font-extrabold bg-gradient-to-r from-black via-neutral-500 to-black bg-clip-text text-transparent">
                   {score} / {questions.length}
                 </h2>
                 <p className="text-lg text-neutral-600">{getResultMessage()}</p>
               </div>
 
               <div className="flex gap-3">
-                <Button
+                <button
                   onClick={shareOnX}
-                  className="flex-1 bg-black text-white font-semibold py-6 hover:bg-neutral-800 transition-all"
+                  className="flex-1 bg-black text-white font-semibold py-4 rounded-lg hover:bg-neutral-800 transition-all"
                 >
                   Share on X
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={restartQuiz}
-                  variant="outline"
-                  className="flex-1 border-2 border-neutral-300 font-semibold py-6 hover:bg-neutral-100 transition-all"
+                  className="flex-1 border-2 border-neutral-300 font-semibold py-4 rounded-lg hover:bg-neutral-100 transition-all"
                 >
                   Play Again
-                </Button>
+                </button>
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
